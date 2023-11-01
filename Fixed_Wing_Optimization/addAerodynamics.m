@@ -1,6 +1,6 @@
 %Model and add aerodynamic coefficients and constraints to the optimization problem.
 function [aircraft, wing, fuselage, hTail, vTail, designprob] = ...
-        addAerodynamics(aircraft, wing, fuselage, hTail, vTail, designprob)
+        addAerodynamics(aircraft, wing,payload , fuselage, hTail, vTail, designprob)
 %Wing Aerodynamics
 %Use Prandtl lifing-line theory to estimate the wing's lift and drag 
 % coefficients. This theory is valid for wings of high enough aspect ratio,
@@ -65,8 +65,13 @@ Cf = 0.455*(log(10)/log(aircraft.RePerLength*fuselage.LengthBody))^2.58;    % Sk
 FF = (1+60/fuselage.Fineness^3 + fuselage.Fineness/400);                    % Form Factor
 fuselage.Cd = Cf*FF*fuselage.WettedArea/aircraft.ReferenceArea;             % Skin Friction Drag
 
+Cp = 0.455*(log(10)/log(aircraft.RePerLength*payload.Boxed.Length))^2.58;   % Skin Friction Coefficient
+Fp = (1+60/payload.Fineness^3 + payload.Fineness/400);                      % Form Factor
+payload.Cd = Cp*Fp*payload.WettedArea/aircraft.ReferenceArea;               % Skin Friction Drag
+
+
 %Whole Aircraft Aerodynamics
-aircraft.Cd0 = wing.Cd0 + fuselage.Cd...
+aircraft.Cd0 = wing.Cd0 + fuselage.Cd + payload.Cd...
     +hTail.Cd0*hTail.Efficiency*(hTail.PlanformArea/aircraft.ReferenceArea)...
     +vTail.Cd0*(vTail.PlanformArea/aircraft.ReferenceArea);                 % Parastic Drag
 aircraft.K = wing.K;                                                        % Lift Dependent Drag

@@ -1,43 +1,40 @@
 %Compute spherical and boxed payloads mass moment of inertia.
-function I = payloadInertia(Payload_Spherical, Payload_XLoc, Payload_Boxed_Length, ...
-                            Payload_Boxed_Mass, Payload_Boxed_Height, Fuselage_SideLength, ...
+function I = payloadInertia(Payload_XLoc, ...
+                            Payload_Boxed_SandMass,Payload_Boxed_EmptyMass, ...
+                            Payload_Boxed_Height, Payload_Boxed_SandHeight, ...
+                            Payload_Boxed_Length,Fuselage_SideLength, ...
                             aircraft_Xcg)
 
+% Sand + Empty Box Inertia in below of boxed
+m_emptbox_at_sand = Payload_Boxed_EmptyMass * ((Payload_Boxed_Height-Payload_Boxed_SandHeight)/Payload_Boxed_Height);
+mass_below = Payload_Boxed_SandMass + m_emptbox_at_sand;
 
-% Payload contribution
-% % Spherical Payload: Spherical Shell has well define inertia
-% Isxx = 2/3*Payload_Spherical.Mass*Payload_Spherical.Diameter^2;
-% Isyy = Isxx;
-% 
-% % Use parallel axis theorem
-% Xcg_sphere = Payload_XLoc + Payload_Boxed_Length/2 + Payload_Spherical.Diameter/2;
-% Isyy = Isyy + (Xcg_sphere - aircraft_Xcg)^2*Payload_Spherical.Mass;
-% Iszz = Isyy;
-% Is = diag([Isxx Isyy Iszz]);
+Iabxx = 1/12*mass_below*(Payload_Boxed_SandHeight^2 + Fuselage_SideLength.^2);
+Iabyy = 1/12*mass_below*(Payload_Boxed_SandHeight^2 + Payload_Boxed_Length.^2);
+Iabzz = 1/12*mass_below*(Payload_Boxed_Length.^2 + Fuselage_SideLength.^2);
 
-% % Boxed Payload Forward
-% Ipfxx = 1/12*Payload_Boxed_Mass/2*(Payload_Boxed_Height^2 + Fuselage_SideLength.^2);
-% Ipfyy = 1/12*Payload_Boxed_Mass/2*(Payload_Boxed_Height^2 + Payload_Boxed_Length.^2/4);
-% Ipfzz = 1/12*Payload_Boxed_Mass/2*(Payload_Boxed_Length.^2/4 + Fuselage_SideLength.^2);
-% 
-% % Use parallel axis theorem
-% Xcgf = Payload_XLoc + Payload_Boxed_Length/4;
-% Zcg = Payload_Boxed_Height/2;
-% Ipfxx = Ipfxx + (Zcg - Fuselage_SideLength/2)^2*Payload_Boxed_Mass/2;
-% Ipfyy = Ipfyy + ((Zcg - Fuselage_SideLength/2)^2 + (Xcgf - aircraft_Xcg)^2)*Payload_Boxed_Mass/2;
-% Ipfzz = Ipfzz + (Xcgf - aircraft_Xcg)^2*Payload_Boxed_Mass/2;
-% Ipf = diag([Ipfxx Ipfyy Ipfzz]);
+% Use parallel axis theorem
+Xcgf = Payload_XLoc + Payload_Boxed_Length/2;
+Zcg = Payload_Boxed_Height - Payload_Boxed_SandHeight/2;
+Iabxx = Iabxx + (Zcg + Fuselage_SideLength/2)^2*mass_below;
+Iabyy = Iabyy + ((Zcg + Fuselage_SideLength/2)^2 + (Xcgf - aircraft_Xcg)^2)*mass_below;
+Iabzz = Iabzz + (Xcgf - aircraft_Xcg)^2*mass_below;
+Iab = diag([Iabxx Iabyy Iabzz]);
 
-% Boxed Payload Aft
-% Same as Forward
+% Just Empty Box Inertia in above of Boxed
+m_emptbox_at_above = Payload_Boxed_EmptyMass - m_emptbox_at_sand;
 
-% % Use parallel axis theorem
-% Xcga = Payload_XLoc + Payload_Spherical.Diameter + Payload_Boxed_Length*3/4;
-% Ipaxx = Ipfxx + (Zcg - Fuselage_SideLength/2)^2*Payload_Boxed_Mass/2;
-% Ipayy = Ipfyy + ((Zcg - Fuselage_SideLength/2)^2 + (Xcga - aircraft_Xcg)^2)*Payload_Boxed_Mass/2;
-% Ipazz = Ipfzz + (Xcga - aircraft_Xcg)^2*Payload_Boxed_Mass/2;
-% Ipa = diag([Ipaxx Ipayy Ipazz]);
-% 
-% Ip = Ipf + Ipa;
-% I = Ip + Is;
-%Copyright 2022 The MathWorks, Inc.
+Ibexx = 1/12*m_emptbox_at_above*((Payload_Boxed_Height-Payload_Boxed_SandHeight)^2 + Fuselage_SideLength.^2);
+Ibeyy = 1/12*m_emptbox_at_above*((Payload_Boxed_Height-Payload_Boxed_SandHeight)^2 + Payload_Boxed_Length.^2);
+Ibezz = 1/12*m_emptbox_at_above*(Payload_Boxed_Length.^2 + Fuselage_SideLength.^2);
+
+% Use parallel axis theorem
+Xcgf = Payload_XLoc + Payload_Boxed_Length/2;
+Zcg = (Payload_Boxed_Height - Payload_Boxed_SandHeight)/2;
+Ibexx = Ibexx + (Zcg + Fuselage_SideLength/2)^2*m_emptbox_at_above;
+Ibeyy = Ibeyy + ((Zcg + Fuselage_SideLength/2)^2 + (Xcgf - aircraft_Xcg)^2)*m_emptbox_at_above;
+Ibezz = Ibezz + (Xcgf - aircraft_Xcg)^2*m_emptbox_at_above;
+Ibe = diag([Ibexx Ibeyy Ibezz]);
+
+I = Iab + Ibe;
+

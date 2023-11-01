@@ -25,7 +25,27 @@ wing.PlanformArea = (1+wing.TaperRatio)...
 wing.XLoc = optimvar('X_w','LowerBound', 0.15);                        % Placement Location in X-dir [m]
 initialValues.X_w = 0.31;                                              % X Location Initial Value [m]
 wing.Xac = wing.XLoc+0.25*wing.RootChord;                              % Aerodynamic Center [m]
-
+%% Payload Parameters
+aircraft.Avionics.Mass = 1.5;                                          % Weight of Electronics [kg]
+aircraft.Avionics.Xcg = 0.05;                                          % CG Location of Electronics [m]
+aircraft.Avionics.Length = 0.25;                                       % Length of fuselage occupied by Electronics [m]
+% payload.Spherical.Mass = 0.625;                                      % Mass of spherical payload [kg]
+% payload.Spherical.Diameter = 0.22;                                   % Radius of spherical payload [m]
+payload.Boxed.Length = 0.5;                                            % Length of boxed payload [m]
+% initialValues.l_pb = 0.01;                                           % Length of boxed payload Initial Value [m]
+payload.Boxed.Height = 0.1;                                            % Height of boxed payload [m]
+payload.Boxed.SideLengt = 0.1;                                         % Side Lenght of boxed payload [m]
+payload.Boxed.PayLoadHeight = ...
+    optimvar('h_pb','LowerBound',0,'UpperBound',payload.Boxed.Height); % Height of boxed payload [m]
+initialValues.h_pb = 0.03;                                             % Height of boxed payload Initial Value [m]
+payload.Boxed.SandDensity = 2000;                                      % Density of boxed payload [kg/m^3]
+payload.XLoc = optimvar('X_p','LowerBound',0.25);                      % Start Location of cargo bay [m]
+initialValues.X_p = 0.4;                                               % Start Location Initial Value [m]
+payload.Boxed.EmptyMass = 0.2;                                         % Empty box mass [kg]
+payload.Fineness = payload.Boxed.Length...
+    /sqrt(4/pi*payload.Boxed.SideLength^2);                            % Fineness Ratio
+payload.WettedArea = payload.Boxed.Length*payload.Boxed.SideLength...
+    *2*payload.Boxed.Length*payload.Boxed.Height;                      % Wetted/Surface Area [m^2]
 %% Fuselage Parameters
 fuselage.SideLength = 0.23;                                            % Side Length of Square Fuselage Cross-section [m]
 fuselage.Length = optimvar('l_f','LowerBound',0);                      % Length of Fuselage [m]
@@ -35,7 +55,7 @@ initialValues.l_body = 0.50;
 fuselage.Fineness = fuselage.LengthBody...
     /sqrt(4/pi*fuselage.SideLength^2);                                 % Fineness Ratio
 fuselage.WettedArea = 4*fuselage.SideLength...
-    *fuselage.LengthBody;                                              % Wetted/Surface Area [m^2]
+    *fuselage.LengthBody -payload.Boxed.Length*payload.Boxed.SideLengt;% Wetted/Surface Area [m^2]
 fuselage.Density = 2;                                                  % Fuselage mass per unit surface area [kg/m^2]
 fuselage.Xcg = fuselage.LengthBody/2;                                  % CG Location in X-dir [m]
 fuselage.Volume = fuselage.LengthBody...
@@ -71,22 +91,6 @@ vTail.AspectRatio = vTail.HalfSpan/vTail.Chord;                        % Aspect 
 vTail.PlanformArea = vTail.Chord*vTail.HalfSpan;                       % Planform Area [m^2]
 vTail.Xac = fuselage.Length-0.75*vTail.Chord;                          % Aerodynamic Center [m]
 vTail.XLoc = fuselage.Length-vTail.Chord;                              % Leading Edge Location [m]
-
-%% Payload Parameters
-aircraft.Avionics.Mass = 1.5;                                          % Weight of Electronics [kg]
-aircraft.Avionics.Xcg = 0.05;                                          % CG Location of Electronics [m]
-aircraft.Avionics.Length = 0.25;                                       % Length of fuselage occupied by Electronics [m]
-payload.Spherical.Mass = 0.625;                                        % Mass of spherical payload [kg]
-payload.Spherical.Diameter = 0.22;                                     % Radius of spherical payload [m]
-payload.Boxed.Length = optimvar('l_pb','LowerBound',0);                % Length of boxed payload [m]
-initialValues.l_pb = 0.01;                                             % Length of boxed payload Initial Value [m]
-payload.Boxed.Height = ...
-    optimvar('h_pb','LowerBound',0,'UpperBound',0.20);                 % Height of boxed payload [m]
-initialValues.h_pb = 0.01;                                             % Height of boxed payload Initial Value [m]
-payload.Boxed.Density = 2000;                                          % Density of boxed payload [kg/m^3]
-payload.XLoc = optimvar('X_p','LowerBound',0.25);                      % Start Location of cargo bay [m]
-initialValues.X_p = 0.4;                                               % Start Location Initial Value [m]
-
 %% Thrust Parameters
 %The competition sets a power limit of 1kW to the motor, limiting static thrust to around 40N.
 aircraft.MaxThrust = 40.0;                                             % Max Thrust [N]

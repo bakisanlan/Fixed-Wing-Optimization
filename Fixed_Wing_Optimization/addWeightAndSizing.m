@@ -24,7 +24,6 @@ vTail.Mass = vTail.Density*vTail.PlanformArea;                           % Verti
 payload.Boxed.SandMass = payload.Boxed.SandDensity * payload.Boxed.PayLoadHeight * payload.Boxed.Length *payload.Boxed.SideLengt;   
 payload.Mass = payload.Boxed.SandMass + payload.Boxed.EmptyMass;         % Total mass of Payload
 
-
 aircraft.Mass= fuselage.Mass + wing.Mass...
                   + hTail.Mass + vTail.Mass...
                   + aircraft.Avionics.Mass + payload.Mass;               % Gross Aircraft Mass
