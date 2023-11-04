@@ -51,3 +51,4 @@ designprob.Constraints.VTailLoc = fuselage.Length - vTail.Chord -...
                                  (wing.XLoc + wing.RootChord) >= 0.1;
 end
 %Copyright 2022 The MathWorks, Inc.
+deneme
