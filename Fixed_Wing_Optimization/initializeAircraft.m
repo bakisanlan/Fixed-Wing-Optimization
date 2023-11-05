@@ -48,6 +48,7 @@ payload.WettedArea = payload.Boxed.Length*payload.Boxed.SideLength...
     *2*payload.Boxed.Length*payload.Boxed.Height;                      % Wetted/Surface Area [m^2]
 %% Fuselage Parameters
 fuselage.SideLength = 0.23;                                            % Side Length of Square Fuselage Cross-section [m]
+fuselage.CornerRadius = 0.06;                                          % Radius of the Corner of Square Fuselage Cross-section [m]
 fuselage.Length = optimvar('l_f','LowerBound',0);                      % Length of Fuselage [m]
 initialValues.l_f = 0.75;                                              % Length Initial value [m]
 fuselage.LengthBody = optimvar('l_body','LowerBound',0); 
@@ -97,7 +98,7 @@ aircraft.MaxThrust = 40.0;                                             % Max Thr
 aircraft.DynamicThrustQuad = -0.0006;                                  % Quadratic Term Dynamic Thrust Coefficient [kg*m]
 
 %% General Aircraft Parameters
-aircraft.RePerLength = 5e5;                                            % Reynolds Number per unit length [per m]
+aircraft.RePerLength = 1.2e6;                                          % Reynolds Number per unit length [per m]
 aircraft.ReferenceArea = wing.PlanformArea;                            % Reference Area [m^2]
 aircraft.StallAoA = wing.Airfoil.StallAoA;                             % Stall Aerodynamic Angle of Attack [deg]
 aircraft.RollingResistance = 0.004;                                    % Rolling Resistance

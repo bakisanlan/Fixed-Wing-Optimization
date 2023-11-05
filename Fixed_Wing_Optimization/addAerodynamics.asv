@@ -74,8 +74,12 @@ Cfp = (3.46*log10(aircraft.RePerLength*payload.Boxed.Length)-5.6)^(-2);     % Sk
 cs1p =  4.0001;
 cs2p = -2.2792;
 cs3p = 1.11029;
-FFp = cs1p*(payload.Fineness)^cs2p + cs3p;                                     % Form Factor
-payload.Cd = Cfp*FFp*payload.WettedArea/aircraft.ReferenceArea;               % Skin Friction Drag
+FF = cs1*(pay.Fineness)^cs2 + cs3;                                     % Form Factor
+Fp = (1+60/payload.Fineness^3 + payload.Fineness/400);                      % Form Factor
+payload.Cd = Cp*Fp*payload.WettedArea/aircraft.ReferenceArea;               % Skin Friction Drag
+
+
+
 
 %% Whole Aircraft Aerodynamics
 aircraft.Cd0 = wing.Cd0 + fuselage.Cd + payload.Cd...
