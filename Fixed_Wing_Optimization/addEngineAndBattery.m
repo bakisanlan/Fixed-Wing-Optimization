@@ -1,4 +1,4 @@
-function [t_Flight Batter_mAh RPM] = addEngineAndBattery(CruiseSpeed, Drag)
+function [t_Flight Battery_mAh RPM] = addEngineAndBattery(CruiseSpeed, Drag)
 
 coef = load("coef.mat"); % Coefficients for 14x7 propeller
 % coef.P(N,:) means RPM powers and coef.P(:,N) means V powers.
@@ -27,7 +27,7 @@ RPM_solutions = roots([Thrust(1:end-1) , Thrust(end)-Drag]);
 
 for i = 1: length(RPM_solutions)
     if isreal(RPM_solutions(i)) && RPM_solutions(i) > 3000
-        RPM_correct_solution = RPM_solutions(i);
+        RPM = RPM_solutions(i);
     end
 end
 
@@ -35,7 +35,7 @@ end
 a = 0.992;
 b = 0.0004307;
 c = -1.065;
-Current = a*exp(b*RPM_correct_solution)+c; % in A
+Current = a*exp(b*RPM)+c; % in A
 
 FlightPath = 5000; % in m
 SF_FlightPath = 1.2; % Using a safety factor in case of flying more than
